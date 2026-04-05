@@ -42,6 +42,7 @@ echo "==> Setting up Python environment..."
 python3 -m venv "$INSTALL_DIR/venv"
 source "$INSTALL_DIR/venv/bin/activate"
 pip3 install --quiet -r "$INSTALL_DIR/requirements.txt"
+pip3 install --quiet -e "$INSTALL_DIR"
 
 # Download MLX model
 MODEL_DIR="$INSTALL_DIR/models/whisper-tiny-mlx"
@@ -71,15 +72,12 @@ if [ -d "$HOME/.claude" ]; then
     echo "==> Installed /voice command for Claude Code"
 fi
 
-# macOS Accessibility permission
+# macOS: Accessibility settings reminder (non-blocking)
 echo ""
-echo "==> ACTION REQUIRED: Grant Accessibility permission to your terminal app"
-echo "    This allows murmur to capture the fn key and inject text system-wide."
-echo "    Opening System Settings -> Privacy & Security -> Accessibility..."
-open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
-echo "    Add your terminal (Terminal.app or iTerm2) and enable it."
-printf "    Press Enter when done... "
-read -r
+echo "==> NOTE: murmur needs Accessibility permission to capture the fn key system-wide."
+echo "    If not already granted: System Settings -> Privacy & Security -> Accessibility"
+echo "    Add your terminal app (Terminal.app or iTerm2) and enable it."
+echo "    If already granted, ignore this — murmur will work immediately."
 
 # Verify
 echo ""
