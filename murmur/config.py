@@ -1,3 +1,4 @@
+import platform
 import toml
 from dataclasses import dataclass, asdict
 from pathlib import Path
@@ -5,11 +6,18 @@ from pathlib import Path
 CONFIG_DIR = Path.home() / ".apple-murmur"
 CONFIG_PATH = CONFIG_DIR / "config.toml"
 
+# fn/Globe key opens emoji picker on macOS — use right Option instead
+_DEFAULT_KEY = "alt_r" if platform.system() == "Darwin" else "fn"
+
 
 @dataclass
 class HotkeyConfig:
-    key: str = "fn"
+    key: str = None
     double_tap_interval_ms: int = 300
+
+    def __post_init__(self):
+        if self.key is None:
+            self.key = _DEFAULT_KEY
 
 
 @dataclass

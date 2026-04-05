@@ -1,12 +1,13 @@
+import platform
 import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
 
 def test_default_config_has_correct_values():
-    from murmur.config import Config, HotkeyConfig, ModelConfig, AudioConfig
+    from murmur.config import Config, _DEFAULT_KEY
     config = Config()
-    assert config.hotkey.key == "fn"
+    assert config.hotkey.key == _DEFAULT_KEY  # platform-aware: alt_r on macOS, fn elsewhere
     assert config.hotkey.double_tap_interval_ms == 300
     assert config.model.name == "tiny.en"
     assert config.model.device == "auto"
@@ -30,9 +31,9 @@ def test_save_and_load_config_roundtrip():
 
 
 def test_load_config_returns_defaults_when_file_missing():
-    from murmur.config import load_config, Config
+    from murmur.config import load_config, _DEFAULT_KEY
     with tempfile.TemporaryDirectory() as tmpdir:
         missing_path = Path(tmpdir) / "nonexistent.toml"
         with patch("murmur.config.CONFIG_PATH", missing_path):
             config = load_config()
-            assert config.hotkey.key == "fn"
+            assert config.hotkey.key == _DEFAULT_KEY

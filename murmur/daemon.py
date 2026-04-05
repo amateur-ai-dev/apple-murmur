@@ -29,6 +29,7 @@ class Daemon:
         self.hotkey = HotkeyListener(
             on_double_tap=self.on_double_tap,
             interval_ms=config.hotkey.double_tap_interval_ms,
+            key=config.hotkey.key,
         )
         self.state = "idle"
         self._lock = threading.Lock()
