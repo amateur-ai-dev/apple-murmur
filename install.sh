@@ -55,13 +55,13 @@ print('Model downloaded.')
 fi
 
 # Install CLI wrapper
-echo "==> Installing murmur CLI..."
-cat > "$BIN_PATH" << 'WRAPPER'
+echo "==> Installing murmur CLI (may prompt for sudo password)..."
+sudo tee "$BIN_PATH" > /dev/null << 'WRAPPER'
 #!/usr/bin/env bash
 source "$HOME/.apple-murmur/venv/bin/activate"
 python3 -m murmur.cli "$@"
 WRAPPER
-chmod +x "$BIN_PATH"
+sudo chmod +x "$BIN_PATH"
 
 # Install Claude Code /voice command
 CLAUDE_CMD_DIR="$HOME/.claude/commands"
