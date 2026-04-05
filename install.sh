@@ -26,6 +26,12 @@ python3 -c "import sys; assert sys.version_info >= (3, 9), 'Python 3.9+ required
 if [ -d "$INSTALL_DIR/.git" ]; then
     echo "==> Updating existing installation..."
     git -C "$INSTALL_DIR" pull --quiet
+elif [ -d "$INSTALL_DIR" ]; then
+    echo "==> Found existing data dir, preserving config and cloning fresh..."
+    [ -f "$INSTALL_DIR/config.toml" ] && cp "$INSTALL_DIR/config.toml" /tmp/apple-murmur-config.toml.bak
+    rm -rf "$INSTALL_DIR"
+    git clone --quiet "$REPO_URL" "$INSTALL_DIR"
+    [ -f /tmp/apple-murmur-config.toml.bak ] && mv /tmp/apple-murmur-config.toml.bak "$INSTALL_DIR/config.toml"
 else
     echo "==> Cloning apple-murmur..."
     git clone --quiet "$REPO_URL" "$INSTALL_DIR"
