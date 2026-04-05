@@ -8,7 +8,7 @@ _BLOCK_SIZE = 512  # 32ms per chunk at 16kHz
 
 class AudioCapture:
     def __init__(self, sample_rate: int = 16000, on_silence=None,
-                 silence_threshold: float = 0.01, silence_duration_s: float = 0.7):
+                 silence_threshold: float = 0.01, silence_duration_s: float = 1.0):
         self.sample_rate = sample_rate
         self._on_silence = on_silence
         self._silence_threshold = silence_threshold

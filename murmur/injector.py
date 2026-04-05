@@ -16,7 +16,10 @@ class Injector:
             self._inject_via_clipboard(text)
         except Exception as e:
             logger.warning("Clipboard injection failed (%s), falling back to typewrite", e)
-            self._inject_via_typewrite(text)
+            try:
+                self._inject_via_typewrite(text)
+            except Exception as e2:
+                logger.error("Typewrite injection also failed: %s", e2)
 
     def _inject_via_clipboard(self, text: str) -> None:
         try:
@@ -34,8 +37,12 @@ class Injector:
 
         time.sleep(0.1)  # wait for paste to complete
 
-        if previous:
-            pyperclip.copy(previous)
+        # Restore previous clipboard — failure here must NOT trigger typewrite fallback
+        try:
+            if previous:
+                pyperclip.copy(previous)
+        except Exception:
+            pass
 
     def _inject_via_typewrite(self, text: str) -> None:
         pyautogui.write(text, interval=0.01)
