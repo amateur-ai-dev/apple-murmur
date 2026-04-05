@@ -6,8 +6,8 @@ from pathlib import Path
 CONFIG_DIR = Path.home() / ".apple-murmur"
 CONFIG_PATH = CONFIG_DIR / "config.toml"
 
-# fn/Globe key opens emoji picker on macOS — use right Option instead
-_DEFAULT_KEY = "alt_r" if platform.system() == "Darwin" else "fn"
+# fn opens emoji picker; alt_r taken by Claude Desktop — use left Control on macOS
+_DEFAULT_KEY = "ctrl_l" if platform.system() == "Darwin" else "fn"
 
 
 @dataclass
