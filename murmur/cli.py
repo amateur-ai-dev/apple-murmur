@@ -20,12 +20,14 @@ def cmd_start(args) -> None:
             PID_FILE.unlink()
 
     PID_FILE.parent.mkdir(parents=True, exist_ok=True)
+    install_dir = Path.home() / ".apple-murmur"
     with open(LOG_FILE, "a") as log:
         proc = subprocess.Popen(
             [sys.executable, "-m", "murmur.daemon"],
             stdout=log,
             stderr=log,
             start_new_session=True,
+            cwd=str(install_dir),
         )
     PID_FILE.write_text(str(proc.pid))
     print(f"murmur started (PID {proc.pid})")
