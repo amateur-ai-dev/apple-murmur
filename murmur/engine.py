@@ -8,6 +8,13 @@ logger = logging.getLogger(__name__)
 
 _MODEL_DIR = Path.home() / ".apple-murmur" / "models"
 
+# Seed vocabulary helps Whisper bias toward IT managed services terminology
+_INITIAL_PROMPT = (
+    "IT managed services, ITSM, ITIL, ServiceNow, incident management, "
+    "change request, SLA, MTTR, infrastructure, Azure, AWS, Active Directory, "
+    "VPN, endpoint, helpdesk, L1 L2 L3 support, Kubernetes, CI/CD, DevOps"
+)
+
 
 class Engine:
     def __init__(self, model_name: str = "whisper-tiny-mlx"):
@@ -22,5 +29,12 @@ class Engine:
         logger.info("MLX engine ready (model loads lazily on first transcribe)")
 
     def transcribe(self, audio: np.ndarray) -> str:
-        result = mlx_whisper.transcribe(audio, path_or_hf_repo=self._model_path)
+        result = mlx_whisper.transcribe(
+            audio,
+            path_or_hf_repo=self._model_path,
+            temperature=0.0,
+            beam_size=3,
+            condition_on_previous_text=True,
+            initial_prompt=_INITIAL_PROMPT,
+        )
         return result["text"].strip()

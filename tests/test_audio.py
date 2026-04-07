@@ -38,6 +38,7 @@ def test_start_creates_input_stream_with_correct_params():
             samplerate=16000,
             channels=1,
             dtype="float32",
+            blocksize=480,
             callback=capture._callback,
         )
         mock_stream.start.assert_called_once()

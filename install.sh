@@ -55,6 +55,19 @@ print('Model downloaded.')
 "
 fi
 
+# Build KenLM domain language model (optional — improves IT terminology correction)
+KLM_PATH="$INSTALL_DIR/models/domain.klm"
+if [ ! -f "$KLM_PATH" ] && command -v lmplz &>/dev/null; then
+    echo "==> Building KenLM domain language model..."
+    python3 "$INSTALL_DIR/scripts/build_domain_corpus.py" \
+        | lmplz -o 3 --discount_fallback 2>/dev/null \
+        | build_binary /dev/stdin "$KLM_PATH" 2>/dev/null \
+        && echo "    Domain LM built: $KLM_PATH" \
+        || echo "    KenLM build failed — IT term correction will use fuzzy matching only (non-fatal)"
+elif [ ! -f "$KLM_PATH" ]; then
+    echo "==> lmplz not found — skipping KenLM domain model (non-fatal, fuzzy matching still active)"
+fi
+
 # Install CLI wrapper
 echo "==> Installing murmur CLI (may prompt for sudo password)..."
 sudo tee "$BIN_PATH" > /dev/null << 'WRAPPER'

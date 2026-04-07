@@ -1,9 +1,25 @@
+import logging
 import threading
 
 import numpy as np
 import sounddevice as sd
 
-_BLOCK_SIZE = 512  # 32ms per chunk at 16kHz
+logger = logging.getLogger(__name__)
+
+# 480 samples = exactly 30ms at 16kHz — required by webrtcvad for frame processing.
+# Also used by preprocessor._strip_silence_vad; both must stay in sync.
+_BLOCK_SIZE = 480
+
+_VAD_AGGRESSIVENESS = 2  # 0 (permissive) – 3 (aggressive)
+
+
+def _make_vad():
+    try:
+        import webrtcvad
+        return webrtcvad.Vad(_VAD_AGGRESSIVENESS)
+    except ImportError:
+        logger.debug("webrtcvad not available — falling back to RMS silence detection")
+        return None
 
 
 class AudioCapture:
@@ -19,6 +35,7 @@ class AudioCapture:
         self._silence_chunks = 0
         self._has_spoken = False
         self._silence_triggered = False
+        self._vad = _make_vad()
 
     def start(self) -> None:
         self._frames = []
@@ -34,13 +51,23 @@ class AudioCapture:
         )
         self._stream.start()
 
+    def _is_speech(self, indata: np.ndarray) -> bool:
+        """Detect speech in a single audio frame using VAD or RMS fallback."""
+        if self._vad is not None:
+            try:
+                pcm = (indata.flatten() * 32767).astype(np.int16)
+                return self._vad.is_speech(pcm.tobytes(), self.sample_rate)
+            except Exception:
+                pass
+        # RMS fallback
+        return float(np.sqrt(np.mean(indata ** 2))) > self._silence_threshold
+
     def _callback(self, indata: np.ndarray, frames: int, time, status) -> None:
         with self._lock:
             self._frames.append(indata.copy())
 
         if self._on_silence and not self._silence_triggered:
-            rms = float(np.sqrt(np.mean(indata ** 2)))
-            if rms > self._silence_threshold:
+            if self._is_speech(indata):
                 self._has_spoken = True
                 self._silence_chunks = 0
             elif self._has_spoken:

@@ -27,7 +27,7 @@ _RULES = [
     (r'\bopen brace\b',             '{'),
     (r'\bclose brace\b',            '}'),
     (r'\bforward slash\b',          '/'),
-    (r'\bback slash\b',             '\\'),
+    (r'\bback slash\b',             '\\\\'),
     (r'\bunderscore\b',             '_'),
     (r'\bampersand\b',              '&'),
     (r'\bpercent sign\b',           '%'),
@@ -55,4 +55,6 @@ def normalize(text: str) -> str:
         text = pattern.sub(replacement, text)
     # Collapse multiple spaces introduced by substitutions
     text = re.sub(r' {2,}', ' ', text)
-    return text.strip()
+    text = text.strip()
+    from murmur.vocabulary import correct  # lazy to avoid circular import at module load
+    return correct(text)
