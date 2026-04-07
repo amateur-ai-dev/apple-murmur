@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 # Also used by preprocessor._strip_silence_vad; both must stay in sync.
 _BLOCK_SIZE = 480
 
-_VAD_AGGRESSIVENESS = 2  # 0 (permissive) – 3 (aggressive)
+from murmur.preprocessor import _VAD_AGGRESSIVENESS  # single source of truth; preprocessor owns this constant
 
 
 def _make_vad():

@@ -43,6 +43,8 @@ def _strip_silence_vad(audio: np.ndarray, sample_rate: int) -> np.ndarray:
     pcm = (audio * 32767).astype(np.int16)
     voiced = []
 
+    # Trailing samples that don't fill a complete 480-sample frame are intentionally
+    # discarded (at most ~30ms at 16kHz) — webrtcvad requires exact frame sizes.
     for start in range(0, len(pcm) - _VAD_FRAME_SAMPLES + 1, _VAD_FRAME_SAMPLES):
         frame = pcm[start:start + _VAD_FRAME_SAMPLES]
         try:

@@ -63,8 +63,9 @@ def correct(text: str) -> str:
         if not eligible:
             continue
 
-        if use_lm and len(eligible) > 1:
-            # Pick the candidate that most improves the sentence LM score
+        if use_lm:
+            # Pick the candidate that most improves the sentence LM score;
+            # only substitute if there is a positive log-prob gain.
             best_word, best_delta = word, 0.0
             for candidate, _ in eligible:
                 trial = result[:i] + [candidate] + result[i + 1:]

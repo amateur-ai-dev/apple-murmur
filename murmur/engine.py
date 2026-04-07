@@ -17,7 +17,7 @@ _INITIAL_PROMPT = (
 
 
 class Engine:
-    def __init__(self, model_name: str = "whisper-tiny-mlx"):
+    def __init__(self, model_name: str = "whisper-tiny-mlx", device=None):  # device unused; MLX auto-selects Neural Engine / GPU
         self.model_name = model_name
         self._model_path = str(_MODEL_DIR / model_name)
         # MLX models lazy-load on first inference call — no explicit load step needed

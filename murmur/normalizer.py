@@ -34,16 +34,6 @@ _RULES = [
     (r'\bnew line\b',               '\n'),
     (r'\bnewline\b',                '\n'),
 
-    # Colloquial / informal contractions whisper sometimes expands
-    (r'\bgoing to\b',   'gonna'),
-    (r'\bwant to\b',    'wanna'),
-    (r'\bgot to\b',     'gotta'),
-    (r'\bhave to\b',    'hafta'),
-    (r'\bout of\b',     'outta'),
-    (r'\ba lot of\b',   'alotta'),
-    (r'\bkind of\b',    'kinda'),
-    (r'\bsort of\b',    'sorta'),
-    (r'\bused to\b',    'usta'),
 ]
 
 # Compile once
