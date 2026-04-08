@@ -164,6 +164,145 @@ def test_full_stop():
 
 
 # ---------------------------------------------------------------------------
+# Comparison operators (must precede < > = ! rules)
+# ---------------------------------------------------------------------------
+
+def test_not_equal():
+    assert normalize("not equal") == "!="
+
+def test_not_equals():
+    assert normalize("not equals") == "!="
+
+def test_not_equal_to():
+    assert normalize("not equal to") == "!="
+
+def test_exclamation_equals():
+    assert normalize("exclamation equals") == "!="
+
+def test_less_than_or_equal():
+    assert normalize("less than or equal") == "<="
+
+def test_less_than_or_equal_to():
+    assert normalize("less than or equal to") == "<="
+
+def test_greater_than_or_equal():
+    assert normalize("greater than or equal") == ">="
+
+def test_greater_than_or_equal_to():
+    assert normalize("greater than or equal to") == ">="
+
+def test_left_arrow():
+    assert normalize("left arrow") == "<-"
+
+def test_right_shift():
+    assert normalize("right shift") == ">>"
+
+def test_left_shift():
+    assert normalize("left shift") == "<<"
+
+def test_append():
+    assert normalize("append") == ">>"
+
+
+# ---------------------------------------------------------------------------
+# Slash variants
+# ---------------------------------------------------------------------------
+
+def test_slash():
+    assert normalize("slash") == "/"
+
+def test_forward_slash_still_works():
+    assert normalize("forward slash") == "/"
+
+def test_divided_by():
+    assert normalize("divided by") == "/"
+
+def test_backslash_one_word():
+    assert normalize("backslash") == "\\"
+
+
+# ---------------------------------------------------------------------------
+# Hash / pound variants
+# ---------------------------------------------------------------------------
+
+def test_hash():
+    assert normalize("hash") == "#"
+
+def test_pound():
+    assert normalize("pound") == "#"
+
+def test_pound_sign():
+    assert normalize("pound sign") == "#"
+
+def test_number_sign():
+    assert normalize("number sign") == "#"
+
+
+# ---------------------------------------------------------------------------
+# Bracket / brace / angle aliases
+# ---------------------------------------------------------------------------
+
+def test_open_square():
+    assert normalize("open square") == "["
+
+def test_close_square():
+    assert normalize("close square") == "]"
+
+def test_open_curly():
+    assert normalize("open curly") == "{"
+
+def test_close_curly():
+    assert normalize("close curly") == "}"
+
+def test_open_angle():
+    assert normalize("open angle") == "<"
+
+def test_close_angle():
+    assert normalize("close angle") == ">"
+
+def test_left_angle_bracket():
+    assert normalize("left angle bracket") == "<"
+
+def test_right_angle_bracket():
+    assert normalize("right angle bracket") == ">"
+
+def test_open_chevron():
+    assert normalize("open chevron") == "<"
+
+def test_close_chevron():
+    assert normalize("close chevron") == ">"
+
+
+# ---------------------------------------------------------------------------
+# New single-symbol aliases
+# ---------------------------------------------------------------------------
+
+def test_times():
+    assert normalize("times") == "*"
+
+def test_multiplied_by():
+    assert normalize("multiplied by") == "*"
+
+def test_percent_standalone():
+    assert normalize("percent") == "%"
+
+def test_exclamation_standalone():
+    assert normalize("exclamation") == "!"
+
+def test_tick():
+    assert normalize("tick") == "`"
+
+def test_apostrophe():
+    assert normalize("apostrophe") == "'"
+
+def test_open_quote():
+    assert normalize("open quote") == '"'
+
+def test_close_quote():
+    assert normalize("close quote") == '"'
+
+
+# ---------------------------------------------------------------------------
 # De-abbreviation (Whisper expands short CLI commands to abbreviation format)
 # ---------------------------------------------------------------------------
 
@@ -223,9 +362,6 @@ def test_double_hyphen():
 
 def test_at_sign_still_works():
     assert normalize("at sign") == "@"
-
-def test_forward_slash_still_works():
-    assert normalize("forward slash") == "/"
 
 def test_underscore_still_works():
     assert normalize("underscore") == "_"
