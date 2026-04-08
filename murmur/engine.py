@@ -8,11 +8,60 @@ logger = logging.getLogger(__name__)
 
 _MODEL_DIR = Path.home() / ".apple-murmur" / "models"
 
-# Seed vocabulary helps Whisper bias toward IT managed services terminology
+# Seed vocabulary helps Whisper bias toward CLI/terminal, IT, and Indian names
 _INITIAL_PROMPT = (
-    "IT managed services, ITSM, ITIL, ServiceNow, incident management, "
-    "change request, SLA, MTTR, infrastructure, Azure, AWS, Active Directory, "
-    "VPN, endpoint, helpdesk, L1 L2 L3 support, Kubernetes, CI/CD, DevOps"
+    # Shell built-ins and file ops
+    "bash zsh sh fish chmod chown chgrp sudo su export source alias env printenv "
+    "which whereis type echo printf read exec eval trap set unset kill jobs bg fg "
+    "nohup disown ulimit umask xargs tee watch ls ll la cd pwd mkdir rmdir rm cp mv "
+    "touch ln find locate stat file du df lsof "
+    # Text tools
+    "cat less more head tail grep egrep fgrep ripgrep rg awk sed cut sort uniq wc "
+    "tr diff patch strings hexdump "
+    # Version control
+    "git gh svn hg git-flow clone commit push pull rebase merge stash diff log "
+    "checkout branch tag GitHub GitLab Bitbucket "
+    # Package managers
+    "npm npx pip pip3 brew apt apt-get yum dnf pacman snap flatpak yarn pnpm cargo "
+    "gem poetry conda mamba composer nuget "
+    # Containers and infra
+    "docker docker-compose kubectl helm k9s kind minikube terraform ansible pulumi "
+    "packer vagrant podman buildah skopeo "
+    # Languages and runtimes
+    "python python3 node nodejs ruby rust java javac golang swift kotlin scala php "
+    "perl lua elixir erlang haskell clojure dotnet "
+    # Databases
+    "psql postgres mysql mysqldump redis-cli mongo mongodump sqlite3 influx clickhouse "
+    # Networking
+    "ssh scp sftp rsync curl wget httpie nc netcat nmap dig nslookup traceroute ping "
+    "ip ifconfig netstat ss tcpdump mtr "
+    # Process and system
+    "ps top htop btop pkill pgrep strace vmstat iostat sar free uptime uname hostname "
+    "dmesg journalctl systemctl launchctl crontab "
+    # Editors
+    "vim nvim nano emacs vscode helix micro "
+    # Build tools
+    "make cmake ninja bazel gradle maven ant rake gulp grunt webpack vite rollup esbuild "
+    # Cloud CLIs
+    "aws gcloud az doctl flyctl vercel netlify heroku railway "
+    # Other common tools
+    "jq yq fzf bat eza zoxide starship tmux screen direnv dotenv "
+    # ITSM and IT ops (retained from v2)
+    "ITIL ITSM ServiceNow Jira Confluence incident escalation SLA MTTR CMDB "
+    "Kubernetes Azure AWS GCP DevOps CI/CD LDAP SSO MFA VPN Datadog Grafana "
+    # Indian first names
+    "Nithin Nikhil Naveen Naresh Nandish Rahul Rajesh Ramesh Rakesh Ravi Rohan Rohit "
+    "Priya Priyanka Pooja Arjun Arun Anand Ankit Anirudh Akshay Abhishek Aditya "
+    "Suresh Sanjay Santosh Satish Sunil Deepak Dinesh Devesh Dhruv Kiran Kavita "
+    "Kartik Kamal Mahesh Manish Mukesh Mohan Vijay Vinay Vishal Vivek Shankar Shyam "
+    "Shreya Shweta Shubham Ganesh Girish Gaurav Amit Harish Hari Hemant Jayesh "
+    "Jayant Lakshmi Laxman Pranav Prasad Prashanth Sachin Samir Teja Tejas Uday "
+    "Usha Vaishnavi Varun Vasanth Yogesh Yashwant Pavan "
+    # Indian surnames
+    "Sharma Verma Gupta Singh Kumar Patel Nair Menon Pillai Rao Reddy Iyer Iyengar "
+    "Agarwal Joshi Mishra Tiwari Pandey Dwivedi Chatterjee Banerjee Mukherjee Ghosh "
+    "Bose Das Sen Naidu Gowda Hegde Shetty Kamath Bhat Pai Shah Mehta Modi Desai "
+    "Bhatt Trivedi Malhotra Kapoor Khanna Arora Bhatia Krishnan Subramaniam Balakrishnan"
 )
 
 

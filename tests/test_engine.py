@@ -41,3 +41,18 @@ def test_load_is_noop_for_mlx():
     from murmur.engine import Engine
     engine = Engine()
     engine.load()  # should not raise
+
+
+def test_initial_prompt_contains_key_cli_terms():
+    from murmur.engine import _INITIAL_PROMPT
+    required = ["git", "docker", "kubectl", "npm", "pip", "brew", "ssh", "curl",
+                "terraform", "python", "bash", "sudo", "grep", "awk", "sed"]
+    for term in required:
+        assert term in _INITIAL_PROMPT, f"Missing CLI term in prompt: {term}"
+
+
+def test_initial_prompt_contains_indian_names():
+    from murmur.engine import _INITIAL_PROMPT
+    required = ["Sharma", "Patel", "Reddy", "Nair", "Rahul", "Priya", "Arjun"]
+    for term in required:
+        assert term in _INITIAL_PROMPT, f"Missing Indian name in prompt: {term}"
