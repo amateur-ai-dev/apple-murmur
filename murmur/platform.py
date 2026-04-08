@@ -34,6 +34,7 @@ def get_active_bundle() -> str:
 
 
 def is_terminal() -> bool:
+    """Return True if the frontmost app is a known terminal emulator."""
     return get_active_bundle() in TERMINAL_BUNDLES
 
 
