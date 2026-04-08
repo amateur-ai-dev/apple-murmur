@@ -82,7 +82,6 @@ class Engine:
             audio,
             path_or_hf_repo=self._model_path,
             temperature=0.0,
-            beam_size=3,
             condition_on_previous_text=True,
             initial_prompt=_INITIAL_PROMPT,
         )
