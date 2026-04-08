@@ -108,3 +108,28 @@ def test_preprocess_returns_float32_ndarray():
         result = preprocess(_audio(), sample_rate=16000)
     assert isinstance(result, np.ndarray)
     assert result.dtype == np.float32
+
+
+def test_preprocess_terminal_mode_skips_vad():
+    """In terminal_mode, VAD stripping must not run — silence frames are preserved."""
+    from murmur.preprocessor import preprocess
+    silence_vad = _silence_vad()  # would strip everything if called
+    passthrough_nr = MagicMock()
+    passthrough_nr.reduce_noise.side_effect = lambda y, **kwargs: y
+    audio = _audio(4800)
+    with patch.dict(sys.modules, {"webrtcvad": silence_vad, "noisereduce": passthrough_nr}):
+        result = preprocess(audio, sample_rate=16000, terminal_mode=True)
+    # VAD should not have been called — audio length unchanged
+    assert len(result) == 4800
+    silence_vad.Vad.assert_not_called()
+
+
+def test_preprocess_default_mode_runs_vad():
+    """In default mode, VAD stripping runs as normal."""
+    from murmur.preprocessor import preprocess
+    speech_vad = _speech_vad()
+    passthrough_nr = MagicMock()
+    passthrough_nr.reduce_noise.side_effect = lambda y, **kwargs: y
+    with patch.dict(sys.modules, {"webrtcvad": speech_vad, "noisereduce": passthrough_nr}):
+        preprocess(_audio(4800), sample_rate=16000, terminal_mode=False)
+    speech_vad.Vad.assert_called_once()

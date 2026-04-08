@@ -60,9 +60,16 @@ def _strip_silence_vad(audio: np.ndarray, sample_rate: int) -> np.ndarray:
     return np.concatenate(voiced)
 
 
-def preprocess(audio: np.ndarray, sample_rate: int) -> np.ndarray:
-    """Full pipeline: noise reduction → normalize volume → strip silence."""
+def preprocess(audio: np.ndarray, sample_rate: int, terminal_mode: bool = False) -> np.ndarray:
+    """Full pipeline: noise reduction → normalize volume → strip silence.
+
+    terminal_mode: when True, VAD silence stripping is skipped so that natural
+    pauses between spoken words are preserved. Whisper uses those gaps to infer
+    word boundaries and insert spaces correctly — important for CLI command dictation
+    where users speak token-by-token with deliberate pauses.
+    """
     audio = _reduce_noise(audio, sample_rate)
     audio = _normalize_volume(audio)
-    audio = _strip_silence_vad(audio, sample_rate)
+    if not terminal_mode:
+        audio = _strip_silence_vad(audio, sample_rate)
     return audio

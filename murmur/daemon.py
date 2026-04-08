@@ -10,6 +10,7 @@ from murmur.engine import Engine
 from murmur.hotkey import HotkeyListener
 from murmur.injector import Injector
 from murmur.normalizer import normalize
+from murmur.platform import is_terminal
 from murmur.preprocessor import preprocess
 
 LOG_FILE = Path.home() / ".apple-murmur" / "murmur.log"
@@ -67,10 +68,11 @@ class Daemon:
 
     def _transcribe(self, audio_data) -> None:
         try:
-            audio_data = preprocess(audio_data, self.audio.sample_rate)
+            in_terminal = is_terminal()
+            audio_data = preprocess(audio_data, self.audio.sample_rate, terminal_mode=in_terminal)
             text = self.engine.transcribe(audio_data)
             text = normalize(text)
-            logger.info("Transcribed: %r", text)
+            logger.info("Transcribed [%s]: %r", "terminal" if in_terminal else "default", text)
             if text:
                 self.injector.inject(text)
         except Exception as e:

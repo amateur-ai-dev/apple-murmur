@@ -10,6 +10,8 @@ TERMINAL_BUNDLES = {
     "io.alacritty",
     "net.kovidgoyal.kitty",
     "com.mitchellh.ghostty",
+    "com.microsoft.VSCode",       # VS Code integrated terminal
+    "com.todesktop.230313mzl4w4u44",  # Cursor editor terminal
 }
 
 _OSASCRIPT = (
