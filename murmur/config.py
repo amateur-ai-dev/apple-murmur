@@ -22,7 +22,7 @@ class HotkeyConfig:
 
 @dataclass
 class ModelConfig:
-    name: str = "tiny.en"
+    name: str = "whisper-tiny-mlx"
     device: str = "auto"  # auto | mps | cuda | cpu
 
 
