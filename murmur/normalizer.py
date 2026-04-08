@@ -35,6 +35,7 @@ _RULES = [
     (r'\bfat\s+arrow\b',                '=>'),
     (r'\bequals\s+greater\s+than\b',    '=>'),
     (r'\bright\s+arrow\b',              '->'),
+    (r'\bdash\s+greater\s+than\b',      '->'),
     (r'\bat\s+the\s+rate\b',            '@'),
 
     # Punctuation names (existing + at sign kept for backwards compat)
@@ -51,6 +52,9 @@ _RULES = [
     (r'\bunderscore\b',                  '_'),
     (r'\bampersand\b',                   '&'),
     (r'\bpercent\s+sign\b',             '%'),
+    # NOTE: \n injected here is collapsed by vocabulary.correct() which uses str.split().
+    # The rule fires correctly but the newline does not survive the full normalize() pipeline.
+    # To observe the effect, test against _COMPILED directly (see test_newline_still_works).
     (r'\bnew\s*line\b',                  '\n'),
 
     # Single-character CLI symbols
@@ -64,6 +68,7 @@ _RULES = [
     (r'\bdollar\s+sign\b',              '$'),
     (r'\bdollar\b',                      '$'),
     (r'\bdash\b',                        '-'),
+    (r'\bequals\s+sign\b',              '='),
     (r'\bequal\s+sign\b',               '='),
     (r'\bequals\b',                      '='),
     (r'\bbang\b',                        '!'),

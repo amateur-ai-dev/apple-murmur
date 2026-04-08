@@ -64,6 +64,9 @@ def test_equals_greater_than():
 def test_right_arrow():
     assert normalize("right arrow") == "->"
 
+def test_dash_greater_than():
+    assert normalize("dash greater than") == "->"
+
 def test_at_the_rate():
     assert normalize("at the rate") == "@"
 
@@ -104,6 +107,9 @@ def test_dash():
 
 def test_equals():
     assert normalize("equals") == "="
+
+def test_equals_sign():
+    assert normalize("equals sign") == "="
 
 def test_equal_sign():
     assert normalize("equal sign") == "="
