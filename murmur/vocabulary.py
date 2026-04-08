@@ -34,6 +34,34 @@ _VOCAB = [
     # General
     "authentication", "authorization", "monitoring", "alerting", "observability",
     "virtualization", "containerization", "orchestration",
+    # CLI tools and shell
+    "git", "gh", "npm", "npx", "pip", "pip3", "brew", "apt", "yarn", "pnpm",
+    "cargo", "gem", "poetry", "conda", "docker", "kubectl", "helm", "terraform",
+    "ansible", "pulumi", "python", "python3", "node", "ruby", "rust", "golang",
+    "java", "swift", "psql", "mysql", "redis", "mongo", "sqlite", "nginx",
+    "systemctl", "journalctl", "ssh", "scp", "curl", "wget", "rsync", "grep",
+    "awk", "sed", "vim", "nvim", "tmux", "screen", "jq", "yq", "fzf",
+    "GitHub", "GitLab", "Bitbucket", "Homebrew", "PyPI", "crontab",
+    "chmod", "chown", "sudo", "bash", "zsh", "fish", "vscode", "heroku",
+    "vercel", "netlify", "webpack", "vite", "gcloud",
+    # Indian first names
+    "Nithin", "Nikhil", "Naveen", "Naresh", "Nandish", "Rahul", "Rajesh",
+    "Ramesh", "Rakesh", "Ravi", "Rohan", "Rohit", "Priya", "Priyanka", "Pooja",
+    "Arjun", "Arun", "Anand", "Ankit", "Anirudh", "Akshay", "Abhishek", "Aditya",
+    "Suresh", "Sanjay", "Santosh", "Satish", "Sunil", "Deepak", "Dinesh",
+    "Devesh", "Dhruv", "Kiran", "Kavita", "Kartik", "Kamal", "Mahesh", "Manish",
+    "Mukesh", "Mohan", "Vijay", "Vinay", "Vishal", "Vivek", "Shankar", "Shyam",
+    "Shreya", "Shweta", "Shubham", "Ganesh", "Girish", "Gaurav", "Amit",
+    "Harish", "Hari", "Hemant", "Jayesh", "Jayant", "Lakshmi", "Laxman",
+    "Pranav", "Prasad", "Prashanth", "Sachin", "Samir", "Teja", "Tejas",
+    "Uday", "Usha", "Vaishnavi", "Varun", "Vasanth", "Yogesh", "Yashwant", "Pavan",
+    # Indian surnames
+    "Sharma", "Verma", "Gupta", "Singh", "Kumar", "Patel", "Nair", "Menon",
+    "Pillai", "Rao", "Reddy", "Iyer", "Iyengar", "Agarwal", "Joshi", "Mishra",
+    "Tiwari", "Pandey", "Dwivedi", "Chatterjee", "Banerjee", "Mukherjee", "Ghosh",
+    "Bose", "Das", "Sen", "Naidu", "Gowda", "Hegde", "Shetty", "Kamath", "Bhat",
+    "Pai", "Shah", "Mehta", "Modi", "Desai", "Bhatt", "Trivedi", "Malhotra",
+    "Kapoor", "Khanna", "Arora", "Bhatia", "Krishnan", "Subramaniam", "Balakrishnan",
 ]
 
 # Only substitute if similarity is at or above this threshold

@@ -107,6 +107,22 @@ def test_correct_lm_single_candidate_rejected_when_score_worsens():
     assert result == "incedent"
 
 
+def test_vocab_contains_cli_tools():
+    from murmur.vocabulary import _VOCAB
+    required = ["git", "docker", "kubectl", "npm", "pip", "brew", "ssh", "curl",
+                "terraform", "vim", "tmux", "GitHub", "GitLab"]
+    for term in required:
+        assert term in _VOCAB, f"Missing CLI tool in _VOCAB: {term}"
+
+
+def test_vocab_contains_indian_names():
+    from murmur.vocabulary import _VOCAB
+    required = ["Sharma", "Patel", "Reddy", "Nair", "Rahul", "Priya", "Arjun",
+                "Krishnan", "Balakrishnan"]
+    for term in required:
+        assert term in _VOCAB, f"Missing Indian name in _VOCAB: {term}"
+
+
 def test_correct_lm_picks_best_among_multiple_candidates():
     """LM should pick the candidate with the highest log-prob gain."""
     scores = {"incedent": -10.0, "incident": -7.0, "endpoint": -9.0}
