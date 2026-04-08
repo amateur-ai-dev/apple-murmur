@@ -28,7 +28,6 @@ class Daemon:
         self.engine = Engine(model_name=config.model.name, device=config.model.device)
         self.audio = AudioCapture(
             sample_rate=config.audio.sample_rate,
-            on_silence=self._on_silence,
         )
         self.injector = Injector()
         self.hotkey = HotkeyListener(
@@ -63,17 +62,6 @@ class Daemon:
                 logger.info("Recording stopped (%.1fs)", len(audio_to_transcribe) / 16000)
             # state == "transcribing": ignore double-tap
 
-        if audio_to_transcribe is not None:
-            self._transcribe(audio_to_transcribe)
-
-    def _on_silence(self) -> None:
-        """Auto-stop triggered by silence detection — same transition as second double-tap."""
-        audio_to_transcribe = None
-        with self._lock:
-            if self.state == "recording":
-                self.state = "transcribing"
-                audio_to_transcribe = self.audio.stop()
-                logger.info("Auto-stopped on silence (%.1fs)", len(audio_to_transcribe) / 16000)
         if audio_to_transcribe is not None:
             self._transcribe(audio_to_transcribe)
 
