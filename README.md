@@ -23,7 +23,7 @@ murmur update    # pull latest version
 
 Or from Claude Code: `/voice`
 
-**Recording:** Double-tap **Left Control** (`ctrl_l`) to start. Stop either by double-tapping again, or just pause — the daemon auto-stops after ~1s of silence.
+**Recording:** Double-tap **Left Control** (`ctrl_l`) to start. Double-tap again to stop and transcribe. There is no silence-based auto-stop — recording continues until you explicitly tap again.
 
 > **Hotkey note:** `fn` is not used — macOS reserves it for the emoji picker. The default is Left Control. Override in `~/.apple-murmur/config.toml` if needed:
 > ```toml
@@ -41,28 +41,54 @@ Or from Claude Code: `/voice`
 ## How it works
 
 ```
-Hotkey (ctrl_l ×2)
-    → Audio capture (sounddevice, 16kHz, webrtcvad auto-stop)
+Hotkey (ctrl_l ×2 to start, ctrl_l ×2 to stop)
+    → Audio capture (sounddevice, 16kHz)
     → Preprocessing (noisereduce → volume normalise → VAD silence strip)
     → Whisper tiny (MLX, Apple Neural Engine, beam=3, temperature=0)
-    → Normalizer (spoken punctuation → symbols)
-    → Vocabulary correction (IT domain terms via rapidfuzz + optional KenLM)
+    → Normalizer (spoken symbols → characters)
+    → Vocabulary correction (CLI, IT, Indian names via rapidfuzz + optional KenLM)
     → Text injection (clipboard paste, any app)
 ```
 
-- **Engine** — Whisper tiny on the Neural Engine via MLX; IT-biased initial prompt improves jargon accuracy
+- **Engine** — Whisper tiny on the Neural Engine via MLX; initial prompt biases toward CLI tools, IT terms, and Indian names
 - **Preprocessing** — noise reduction, volume normalisation, and VAD-based silence stripping before inference
-- **Vocabulary correction** — fuzzy-matches against an IT managed services vocabulary (ITSM, Kubernetes, SLA, MTTR, …); optionally validated by a KenLM domain language model
+- **Normalizer** — converts spoken symbols to characters (`dash dash` → `--`, `pipe` → `|`, `greater than` → `>`, `at the rate` → `@`, and 30+ more)
+- **Vocabulary correction** — fuzzy-matches against CLI tools, IT managed services terms, and Indian names (rapidfuzz threshold 88); optionally validated by a KenLM domain language model
 - **Hotkey** — Left Control double-tap, global capture via pynput
 - **Injection** — clipboard paste into any focused text field, system-wide
 
 No data leaves your machine. No API keys. No subscriptions.
 
-## IT Domain Vocabulary
+## Spoken Symbols
 
-The transcription pipeline is tuned for IT managed services speech. Common terms that Whisper may mishear are corrected post-transcription:
+Speak CLI symbols by name — they are converted automatically:
 
-> "servise now" → **ServiceNow** · "kubernetes" → **Kubernetes** · "MTBR" → **MTBF** · "itsim" → **ITSM**
+| Say | Gets | Say | Gets |
+|---|---|---|---|
+| `dash dash verbose` | `--verbose` | `pipe` | `\|` |
+| `dash f` | `-f` | `greater than` | `>` |
+| `double pipe` | `\|\|` | `less than` | `<` |
+| `double ampersand` | `&&` | `semicolon` | `;` |
+| `fat arrow` | `=>` | `tilde` | `~` |
+| `right arrow` | `->` | `dollar sign` | `$` |
+| `double colon` | `::` | `backtick` | `` ` `` |
+| `double equals` | `==` | `bang` | `!` |
+| `at the rate` | `@` | `caret` | `^` |
+| `double greater than` | `>>` | `asterisk` | `*` |
+| `single quote` | `'` | `double quote` | `"` |
+| `triple dot` | `...` | `ellipsis` | `...` |
+
+Existing spoken-punctuation rules (`at sign`, `open paren`, `forward slash`, `hashtag`, `underscore`, `ampersand`, …) are also supported.
+
+## Vocabulary Correction
+
+The transcription pipeline corrects misheard words in three domains:
+
+**CLI tools and shell** — git, docker, kubectl, npm, pip, brew, ssh, terraform, ansible, kubectl, helm, vim, tmux, GitHub, GitLab, and 60+ more. Common mishearings (e.g. "cud get curl" → `kubectl`) are caught by rapidfuzz at threshold 88.
+
+**IT managed services** — ITSM, ITIL, ServiceNow, Jira, SLA, MTTR, Kubernetes, Azure, AWS, Datadog, and the full IT ops vocabulary from v2.
+
+**Indian names** — ~70 common first names (Rahul, Priya, Arjun, Nithin, Sharma, …) and ~50 surnames (Sharma, Patel, Reddy, Nair, Krishnan, …) for accurate transcription of Indian names in any context.
 
 An optional KenLM domain language model (built at install time when `lmplz` is available) improves multi-candidate selection using sentence-level log-probability.
 
