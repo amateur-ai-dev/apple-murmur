@@ -9,7 +9,7 @@ def test_default_config_has_correct_values():
     config = Config()
     assert config.hotkey.key == _DEFAULT_KEY  # platform-aware: alt_r on macOS, fn elsewhere
     assert config.hotkey.double_tap_interval_ms == 300
-    assert config.model.name == "tiny.en"
+    assert config.model.name == "whisper-tiny-mlx"
     assert config.model.device == "auto"
     assert config.audio.sample_rate == 16000
     assert config.audio.channels == 1

@@ -46,6 +46,14 @@ _INITIAL_PROMPT = (
     "aws gcloud az doctl flyctl vercel netlify heroku railway "
     # Other common tools
     "jq yq fzf bat eza zoxide starship tmux screen direnv dotenv "
+    # Common CLI command + flag patterns (helps Whisper output correct format)
+    "rm -rf ls -la ls -lh chmod 755 chmod 644 grep -r grep -i grep -n "
+    "git status git commit git push git pull git log git diff git checkout "
+    "docker ps -a docker run docker build docker-compose up "
+    "kubectl get pods kubectl apply kubectl delete "
+    "pip install pip3 install npm install yarn add "
+    "ssh -i ssh -L curl -X curl -H wget -O "
+    "find . -name find . -type tar -xzf tar -czf "
     # ITSM and IT ops (retained from v2)
     "ITIL ITSM ServiceNow Jira Confluence incident escalation SLA MTTR CMDB "
     "Kubernetes Azure AWS GCP DevOps CI/CD LDAP SSO MFA VPN Datadog Grafana "

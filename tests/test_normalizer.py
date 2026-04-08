@@ -164,6 +164,60 @@ def test_full_stop():
 
 
 # ---------------------------------------------------------------------------
+# De-abbreviation (Whisper expands short CLI commands to abbreviation format)
+# ---------------------------------------------------------------------------
+
+def test_deabbreviate_rm():
+    assert normalize("R.M. -rf /tmp") == "rm -rf /tmp"
+
+def test_deabbreviate_ls():
+    assert normalize("L.S. -la") == "ls -la"
+
+def test_deabbreviate_cd():
+    assert normalize("C.D. /home") == "cd /home"
+
+def test_deabbreviate_cp():
+    assert normalize("C.P. file.txt /tmp") == "cp file.txt /tmp"
+
+def test_deabbreviate_git():
+    assert normalize("G.I.T. status") == "git status"
+
+def test_deabbreviate_ssh():
+    assert normalize("S.S.H. user@host") == "ssh user@host"
+
+
+# ---------------------------------------------------------------------------
+# Joined flag repair (Whisper joins command and flags with a hyphen)
+# ---------------------------------------------------------------------------
+
+def test_joined_flag_rm_rf():
+    assert normalize("rm-rf /tmp") == "rm -rf /tmp"
+
+def test_joined_flag_ls_la():
+    assert normalize("ls-la") == "ls -la"
+
+def test_joined_flag_grep_r():
+    assert normalize("grep-r pattern") == "grep -r pattern"
+
+
+# ---------------------------------------------------------------------------
+# minus and hyphen as dash synonyms
+# ---------------------------------------------------------------------------
+
+def test_minus_as_dash():
+    assert normalize("minus f") == "-f"
+
+def test_hyphen_as_dash():
+    assert normalize("hyphen f") == "-f"
+
+def test_double_minus():
+    assert normalize("double minus verbose") == "--verbose"
+
+def test_double_hyphen():
+    assert normalize("double hyphen verbose") == "--verbose"
+
+
+# ---------------------------------------------------------------------------
 # Existing rules still work (regression)
 # ---------------------------------------------------------------------------
 

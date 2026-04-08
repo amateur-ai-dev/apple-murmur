@@ -22,6 +22,8 @@ _RULES = [
     (r'\bdouble\s+dot\b',               '..'),
     (r'\bdot\s+dot\b',                  '..'),
     (r'\bdouble\s+dash\b',              '--'),
+    (r'\bdouble\s+minus\b',             '--'),
+    (r'\bdouble\s+hyphen\b',            '--'),
     (r'\bdouble\s+equals\b',            '=='),
     (r'\bdouble\s+colon\b',             '::'),
     (r'\bdouble\s+pipe\b',              '||'),
@@ -68,6 +70,8 @@ _RULES = [
     (r'\bdollar\s+sign\b',              '$'),
     (r'\bdollar\b',                      '$'),
     (r'\bdash\b',                        '-'),
+    (r'\bminus\b',                       '-'),
+    (r'\bhyphen\b',                      '-'),
     (r'\bequals\s+sign\b',              '='),
     (r'\bequal\s+sign\b',               '='),
     (r'\bequals\b',                      '='),
@@ -91,17 +95,47 @@ _RULES = [
 # Compile once
 _COMPILED = [(re.compile(p, re.IGNORECASE), r) for p, r in _RULES]
 
+# Whisper sometimes expands short CLI commands into abbreviation format.
+# e.g. it transcribes "rm" as "R.M.", "ls" as "L.S.", "cd" as "C.D."
+# This pattern collapses any X.Y. / X.Y.Z. abbreviation-style token to lowercase.
+_ABBREV_RE = re.compile(r'\b([A-Z]\.){2,}', re.ASCII)
+
+# When Whisper outputs a command with a flag already joined by a hyphen (e.g. "rm-rf"),
+# it should be split into command + flag with a space: "rm -rf".
+# Only applies when the left side is a known short CLI command (2-3 chars, no digits).
+_JOINED_FLAG_RE = re.compile(r'\b([a-z]{2,4})-([a-zA-Z]{1,6})\b')
+
+
+def _deabbreviate(text: str) -> str:
+    """Convert Whisper abbreviation expansions back to lowercase CLI commands.
+    e.g. 'R.M.' -> 'rm', 'L.S.' -> 'ls', 'G.I.T.' -> 'git'
+    """
+    return _ABBREV_RE.sub(lambda m: m.group(0).replace('.', '').lower(), text)
+
+
+def _fix_joined_flags(text: str) -> str:
+    """Reinsert space between a short command and its flags when Whisper joins them.
+    e.g. 'rm-rf' -> 'rm -rf', 'ls-la' -> 'ls -la', 'git-status' -> 'git -status'
+    Only fires when the left side is 2-4 lowercase letters (CLI command pattern).
+    """
+    return _JOINED_FLAG_RE.sub(lambda m: f"{m.group(1)} -{m.group(2)}", text)
+
 
 def normalize(text: str) -> str:
+    # Step 1: de-abbreviate before any other processing
+    text = _deabbreviate(text)
+    # Step 2: apply all symbol/punctuation rules
     for pattern, replacement in _COMPILED:
         text = pattern.sub(replacement, text)
-    # Remove spaces between a dash/double-dash and the immediately following argument
+    # Step 3: fix joined command-flag tokens Whisper produces (e.g. "rm-rf" -> "rm -rf")
+    text = _fix_joined_flags(text)
+    # Step 4: remove spaces between a dash/double-dash and the immediately following argument
     # e.g. "-- verbose" -> "--verbose", "- f" -> "-f"
     text = re.sub(r'(--?)\s+(\S)', lambda m: m.group(1) + m.group(2), text)
-    # Remove spaces around a period when it sits between non-space chars (file paths, URLs)
+    # Step 5: remove spaces around a period between non-space chars (file paths, URLs)
     # e.g. "out . txt" -> "out.txt"
     text = re.sub(r'(\S)\s+\.\s+(\S)', r'\1.\2', text)
-    # Collapse multiple spaces introduced by substitutions
+    # Step 6: collapse multiple spaces
     text = re.sub(r' {2,}', ' ', text)
     text = text.strip()
     from murmur.vocabulary import correct  # lazy to avoid circular import at module load
