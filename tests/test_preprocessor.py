@@ -102,34 +102,36 @@ def test_reduce_noise_returns_original_on_exception():
 
 def test_preprocess_returns_float32_ndarray():
     from murmur.preprocessor import preprocess
+    from murmur.profiles import DEFAULT_PROFILE
     passthrough_nr = MagicMock()
     passthrough_nr.reduce_noise.side_effect = lambda y, **kwargs: y
     with patch.dict(sys.modules, {"webrtcvad": _speech_vad(), "noisereduce": passthrough_nr}):
-        result = preprocess(_audio(), sample_rate=16000)
+        result = preprocess(_audio(), sample_rate=16000, profile=DEFAULT_PROFILE)
     assert isinstance(result, np.ndarray)
     assert result.dtype == np.float32
 
 
-def test_preprocess_terminal_mode_skips_vad():
-    """In terminal_mode, VAD stripping must not run — silence frames are preserved."""
+def test_preprocess_terminal_profile_skips_vad():
+    """TERMINAL_PROFILE.skip_vad=True — VAD must not run."""
     from murmur.preprocessor import preprocess
+    from murmur.profiles import TERMINAL_PROFILE
     silence_vad = _silence_vad()  # would strip everything if called
     passthrough_nr = MagicMock()
     passthrough_nr.reduce_noise.side_effect = lambda y, **kwargs: y
     audio = _audio(4800)
     with patch.dict(sys.modules, {"webrtcvad": silence_vad, "noisereduce": passthrough_nr}):
-        result = preprocess(audio, sample_rate=16000, terminal_mode=True)
-    # VAD should not have been called — audio length unchanged
+        result = preprocess(audio, sample_rate=16000, profile=TERMINAL_PROFILE)
     assert len(result) == 4800
     silence_vad.Vad.assert_not_called()
 
 
-def test_preprocess_default_mode_runs_vad():
-    """In default mode, VAD stripping runs as normal."""
+def test_preprocess_default_profile_runs_vad():
+    """DEFAULT_PROFILE.skip_vad=False — VAD runs as normal."""
     from murmur.preprocessor import preprocess
+    from murmur.profiles import DEFAULT_PROFILE
     speech_vad = _speech_vad()
     passthrough_nr = MagicMock()
     passthrough_nr.reduce_noise.side_effect = lambda y, **kwargs: y
     with patch.dict(sys.modules, {"webrtcvad": speech_vad, "noisereduce": passthrough_nr}):
-        preprocess(_audio(4800), sample_rate=16000, terminal_mode=False)
+        preprocess(_audio(4800), sample_rate=16000, profile=DEFAULT_PROFILE)
     speech_vad.Vad.assert_called_once()

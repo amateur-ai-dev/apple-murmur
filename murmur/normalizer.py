@@ -167,7 +167,17 @@ def _fix_joined_flags(text: str) -> str:
     return _JOINED_FLAG_RE.sub(lambda m: f"{m.group(1)} -{m.group(2)}", text)
 
 
-def normalize(text: str) -> str:
+def normalize(text: str, profile=None) -> str:
+    """Normalise Whisper transcription output.
+
+    profile: a murmur.profiles.Profile instance (default: DEFAULT_PROFILE).
+    Pass TERMINAL_PROFILE when the active app is a terminal emulator to apply
+    prefix-collapse and explicit space-token handling.
+    """
+    if profile is None:
+        from murmur.profiles import DEFAULT_PROFILE
+        profile = DEFAULT_PROFILE
+
     # Step 1: de-abbreviate before any other processing
     text = _deabbreviate(text)
     # Step 2: apply all symbol/punctuation rules
@@ -184,5 +194,10 @@ def normalize(text: str) -> str:
     # Step 6: collapse multiple spaces
     text = re.sub(r' {2,}', ' ', text)
     text = text.strip()
+    # Step 7: apply profile-specific extra rules (e.g. prefix collapse in terminal mode)
+    for pattern, replacement in profile.extra_rules:
+        text = pattern.sub(replacement, text)
+    if profile.extra_rules:
+        text = re.sub(r' {2,}', ' ', text).strip()
     from murmur.vocabulary import correct  # lazy to avoid circular import at module load
     return correct(text)

@@ -395,3 +395,57 @@ def test_composed_pipe_redirect():
 def test_composed_and():
     # "make double ampersand make install"
     assert normalize("make double ampersand make install") == "make && make install"
+
+
+# ---------------------------------------------------------------------------
+# Terminal profile — prefix collapse and explicit space token
+# ---------------------------------------------------------------------------
+
+def test_terminal_slash_compact():
+    """'slash compact' in terminal mode → '/compact', no space after /."""
+    from murmur.normalizer import normalize
+    from murmur.profiles import TERMINAL_PROFILE
+    assert normalize("slash compact", profile=TERMINAL_PROFILE) == "/compact"
+
+
+def test_terminal_tilde_path():
+    """'tilde projects' in terminal mode → '~projects' (no slash added).
+    For '~/projects', user says 'tilde slash projects'."""
+    from murmur.normalizer import normalize
+    from murmur.profiles import TERMINAL_PROFILE
+    assert normalize("tilde projects", profile=TERMINAL_PROFILE) == "~projects"
+
+
+def test_terminal_tilde_slash_path():
+    """'tilde slash projects' in terminal mode → '~/projects'."""
+    from murmur.normalizer import normalize
+    from murmur.profiles import TERMINAL_PROFILE
+    assert normalize("tilde slash projects", profile=TERMINAL_PROFILE) == "~/projects"
+
+
+def test_terminal_dollar_home():
+    """'dollar HOME' in terminal mode → '$HOME'."""
+    from murmur.normalizer import normalize
+    from murmur.profiles import TERMINAL_PROFILE
+    assert normalize("dollar HOME", profile=TERMINAL_PROFILE) == "$HOME"
+
+
+def test_terminal_explicit_space_after_slash():
+    """'slash space compact' → '/ compact': explicit space survives prefix collapse."""
+    from murmur.normalizer import normalize
+    from murmur.profiles import TERMINAL_PROFILE
+    assert normalize("slash space compact", profile=TERMINAL_PROFILE) == "/ compact"
+
+
+def test_terminal_normal_words_keep_spaces():
+    """Regular words still have spaces between them in terminal mode."""
+    from murmur.normalizer import normalize
+    from murmur.profiles import TERMINAL_PROFILE
+    assert normalize("git status", profile=TERMINAL_PROFILE) == "git status"
+
+
+def test_default_profile_no_prefix_collapse():
+    """DEFAULT_PROFILE does not collapse spaces after /."""
+    from murmur.normalizer import normalize
+    from murmur.profiles import DEFAULT_PROFILE
+    assert normalize("slash compact", profile=DEFAULT_PROFILE) == "/ compact"
