@@ -9,3 +9,4 @@ models/
 *.log
 *.pid
 .DS_Store
+.worktrees/
