@@ -243,9 +243,9 @@ apple-murmur/
 ├── docs/
 │   ├── ISSUES.md              # Bug log with causes + fixes
 │   └── ARCHITECTURE.md        # This file
-├── install.sh                 # One-line curl installer
+├── install.sh                 # One-line curl installer (upgrades pip/setuptools)
 ├── setup.py                   # Package config (entry point: murmur)
-├── requirements.txt           # 12 dependencies
+├── requirements.txt           # 15 dependencies (includes security-pinned transitive deps)
 └── README.md                  # User-facing docs
 ```
 
@@ -257,6 +257,9 @@ apple-murmur/
 |---------|---------|---------|
 | mlx-whisper | ≥0.3.0 | Whisper inference on Apple Neural Engine |
 | sounddevice | ≥0.4.6 | Microphone audio capture (PortAudio bindings) |
+| urllib3 | ≥2.7.0 | HTTP client (transitive, pinned for CVE-2026-44432/44431) |
+| requests | ≥2.33.0 | HTTP library (transitive, pinned for CVE-2026-25645) |
+| filelock | ≥3.20.0 | File locking (transitive, pinned for CVE-2026-22701/CVE-2025-68146) |
 | pynput | ≥1.7.6 | Global keyboard listener for hotkey |
 | pyperclip | ≥1.8.2 | Cross-app clipboard access |
 | pyautogui | ≥0.9.54 | Keyboard simulation (Cmd-V paste, typewrite fallback) |
@@ -266,7 +269,7 @@ apple-murmur/
 | webrtcvad | ≥2.0.10 | Voice activity detection for silence stripping |
 | noisereduce | ≥3.0.0 | Spectral noise reduction |
 | huggingface_hub | ≥0.20.0 | Model download at install time |
-| pytest | ≥7.4.0 | Test framework |
+| pytest | ≥8.5.0 | Test framework |
 
 **Optional:** `kenlm` (not in requirements.txt — built from source when `lmplz` available)
 
@@ -279,6 +282,8 @@ apple-murmur/
 - **Clipboard restoration.** Previous clipboard contents are restored after injection.
 - **macOS Accessibility permission.** Required for global hotkey capture. Granted per-terminal, not per-process.
 - **PID file management.** `~/.apple-murmur/murmur.pid` tracks daemon process. Stale PIDs cleaned up automatically.
+- **Subprocess timeouts.** `cmd_update` git/pip operations have 120s timeouts to prevent hung processes.
+- **Dependency security pinning.** Transitive deps (urllib3, requests, filelock) pinned to CVE-patched minimum versions. pip/setuptools upgraded at install time.
 
 ---
 
@@ -317,6 +322,7 @@ apple-murmur/
 | Text injection | Done | Clipboard paste + typewrite fallback |
 | CLI commands | Done | start/stop/status/update |
 | Config system | Done | TOML, three sections |
-| Install script | Done | One-line curl, venv, model download |
+| Install script | Done | One-line curl, venv, model download, pip/setuptools upgrade |
 | Claude /voice command | Done | Installed to ~/.claude/commands/ |
 | Test suite | Done | 12 test files covering all modules |
+| Dependency security | Done | Transitive deps pinned to CVE-patched versions, subprocess timeouts |

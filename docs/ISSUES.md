@@ -165,6 +165,23 @@ All bugs, breakages, and unexpected behaviours encountered during development. E
 
 ---
 
+## Security Audit (Apollo SOC Scan)
+
+### 30 vulnerabilities found and remediated
+**Commit:** `d811bec`  
+**Scanner:** Apollo SOC (TruffleHog + Grype + OSV-Scanner)  
+**Findings:** 7 TruffleHog false positives (stale worktree venv), 22 Grype dependency CVEs, 1 OSV pytest version issue.  
+**Fixes:**
+1. Deleted stale `.worktrees/feature-parity/` with vulnerable venv packages
+2. Added `pip install --upgrade pip setuptools` to install.sh (fixes setuptools@58.0.4 + pip@21.2.4 CVEs)
+3. Pinned transitive deps: `urllib3>=2.7.0`, `requests>=2.33.0`, `filelock>=3.20.0`
+4. Bumped `pytest>=7.4.0` → `pytest>=8.5.0`
+5. Added `timeout=120` to subprocess.run calls in `cmd_update`
+
+No code-level (SAST) vulnerabilities found.
+
+---
+
 ## Unresolved / Out of Scope
 
 ### Chrome / browser text fields — text injection unreliable

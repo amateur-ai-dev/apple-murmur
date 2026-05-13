@@ -42,8 +42,8 @@ curl -fsSL https://raw.githubusercontent.com/amateur-ai-dev/apple-murmur/main/in
 This will:
 - Check you're on Apple Silicon (M1/M2/M3/M4)
 - Clone the repo to `~/.apple-murmur/`
-- Create a Python virtual environment
-- Install dependencies
+- Create a Python virtual environment with upgraded pip/setuptools
+- Install 15 dependencies (with security-pinned minimum versions)
 - Download the Whisper tiny model (~75MB, one-time)
 - Optionally build a language model for better IT terminology correction
 - Install the `murmur` command to your PATH

@@ -241,7 +241,7 @@ Defaults are used — Left Control, whisper-tiny-mlx, 16kHz mono. The file is op
 1. Checks Apple Silicon (`uname -m` = arm64)
 2. Checks Python 3.9+
 3. Clones repo to `~/.apple-murmur/` (or pulls if already cloned)
-4. Creates Python venv, installs 12 dependencies
+4. Creates Python venv, upgrades pip/setuptools to latest, installs 15 dependencies
 5. Downloads whisper-tiny-mlx model (~75MB) from HuggingFace
 6. Optionally builds KenLM domain model (if `lmplz` available)
 7. Installs `murmur` CLI wrapper to `/usr/local/bin/`
@@ -253,7 +253,7 @@ The wrapper at `/usr/local/bin/murmur` activates the venv and runs `python3 -m m
 
 **Q: How does `murmur update` work?**
 
-Stops daemon if running → `git pull` in install dir → `pip install -r requirements.txt` → restarts daemon if it was running. Simple but effective.
+Stops daemon if running → `git pull` in install dir → `pip install -r requirements.txt` → restarts daemon if it was running. Both subprocess calls have 120s timeouts to prevent hung processes.
 
 **Q: What about reinstalling over an existing non-git install?**
 
@@ -304,6 +304,7 @@ Whisper tiny supports multilingual transcription but accuracy drops significantl
 | **v1: Core daemon** | Audio capture, Whisper engine, hotkey, injection, CLI | `7148884` – `fda01e2` |
 | **v2: Preprocessing** | Noise reduction, VAD, vocabulary correction, KenLM | `c5c5146` – `066c029` |
 | **v3: Terminal optimisation** | Symbol normalizer (140+ rules), CLI vocab, Indian names, profile system | `153cdc6` – `50de935` |
+| **v3.1: Security hardening** | Dependency CVE remediation, subprocess timeouts, stale worktree cleanup | `d811bec` |
 
 ### Key Design Decisions (Chronological)
 
@@ -312,6 +313,34 @@ Whisper tiny supports multilingual transcription but accuracy drops significantl
 3. **Profile system** — Introduced to resolve the conflict between prose and terminal dictation requirements
 4. **Prefix collapse with space protection** — Solving `/compact` vs `/ compact` required a marker-based protection scheme
 5. **KenLM optional** — Made non-blocking after discovering `lmplz` isn't commonly installed on developer machines
+6. **Transitive dep pinning** — Apollo SOC scan found 30 vulnerabilities; resolved by pinning urllib3/requests/filelock minimums, upgrading pip/setuptools at install, and subprocess timeouts
+
+---
+
+## 12b. Security Audit (Apollo SOC Scan)
+
+**Q: What vulnerabilities were found?**
+
+Apollo SOC scanned apple-murmur and found 30 findings across 3 scanners:
+- **TruffleHog (7)** — All false positives in a stale worktree's venv (`site-packages/`). Eliminated by deleting the stale worktree.
+- **Grype (22)** — Dependency CVEs in setuptools@58.0.4 (3 high), pip@21.2.4 (5 medium), pillow@11.3.0 (6, transitive via noisereduce), urllib3@2.6.3 (2 high), requests@2.32.5 (1 medium), filelock@3.19.1 (2 medium), mlx@0.29.3 (2 medium), pytest@8.4.2 (1 medium).
+- **OSV-Scanner (1)** — pytest minimum version too low.
+
+**Q: How were they fixed?**
+
+1. **Stale worktree deleted** — `.worktrees/feature-parity/` contained a full venv with vulnerable packages. Removed entirely. `.gitignore` already excludes `.worktrees/` and `venv/`.
+2. **pip/setuptools upgraded at install time** — Added `pip install --upgrade pip setuptools` to `install.sh` before dependency installation.
+3. **Transitive deps pinned** — Added `urllib3>=2.7.0`, `requests>=2.33.0`, `filelock>=3.20.0` to requirements.txt.
+4. **pytest bumped** — `pytest>=7.4.0` → `pytest>=8.5.0`.
+5. **Subprocess timeouts** — `cmd_update` git/pip calls now have 120s timeouts.
+
+**Q: What about pillow and mlx CVEs?**
+
+Pillow is not a direct dependency — it's pulled transitively by scipy (via noisereduce). The findings were in the stale worktree venv, now deleted. A fresh install pulls the latest version. MLX is controlled upstream by mlx-whisper — pinning it separately would risk version conflicts.
+
+**Q: Were any code-level vulnerabilities found?**
+
+No. No SAST findings. The tool has no network attack surface at runtime, no user input parsing beyond config.toml, and no data persistence.
 
 ---
 
