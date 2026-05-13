@@ -41,6 +41,7 @@ fi
 echo "==> Setting up Python environment..."
 python3 -m venv "$INSTALL_DIR/venv"
 source "$INSTALL_DIR/venv/bin/activate"
+pip3 install --quiet --upgrade pip setuptools
 pip3 install --quiet -r "$INSTALL_DIR/requirements.txt"
 pip3 install --quiet -e "$INSTALL_DIR"
 

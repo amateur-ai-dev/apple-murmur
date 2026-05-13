@@ -65,10 +65,11 @@ def cmd_update(args) -> None:
     was_running = PID_FILE.exists()
     if was_running:
         cmd_stop(args)
-    subprocess.run(["git", "pull"], cwd=install_dir, check=True)
+    subprocess.run(["git", "pull"], cwd=install_dir, check=True, timeout=120)
     subprocess.run(
         [sys.executable, "-m", "pip", "install", "-r", str(install_dir / "requirements.txt")],
         check=True,
+        timeout=120,
     )
     if was_running:
         cmd_start(args)
